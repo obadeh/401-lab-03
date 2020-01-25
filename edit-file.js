@@ -34,11 +34,11 @@ readFilePromise(file)
   return obj;
   })
   .then((obj)=>{
-   let changed= fs.writeFile(file,JSON.stringify(obj), (err) => {
+    fs.writeFile(file,JSON.stringify(obj), (err) => {
       if (err) throw err;
       console.log('The file has been saved!');
     });
-console.log('changed : ', changed);
+
   }).then(()=>{
     readFilePromise(file)
    .then(data=>{
