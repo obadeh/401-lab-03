@@ -1,17 +1,51 @@
 'use strict';
 
 const fs = require('fs');
-const util = require('util')
+const util = require('util');
+const validator= require('./validator.js')
 
 let file = `${__dirname}/data/person.json`;
 
+// call back style
+
+// fs.readFile(file, (err, data) => {
+//   if (err) throw err;
+//   let obj= JSON.parse(data.toString().trim());
+//   console.log(obj);
+// })
+
+
+
 // Promise Style
-// turn the fs.readFile into a promise
+
 let readFilePromise = util.promisify(fs.readFile)
 
-// then, call it 
-
 readFilePromise(file)
-  .then(data => console.log('Promise', data.toString().trim()))
-  .catch(err => { throw err; });
+  .then(data =>  {
+   let obj= JSON.parse(data.toString().trim())
+   console.log('original obj : ', obj);
+   obj.firstName='ahmad';
+   obj.married=true;
+   obj.kids=3;
+   console.log('change to : ', obj);
+   console.log('is object??? : ',validator.isValid(obj,validator.isObject));
 
+
+  return obj;
+  })
+  .then((obj)=>{
+   let changed= fs.writeFile(file,JSON.stringify(obj), (err) => {
+      if (err) throw err;
+      console.log('The file has been saved!');
+    });
+console.log('changed : ', changed);
+  }).then(()=>{
+    readFilePromise(file)
+   .then(data=>{
+    let obj= JSON.parse(data.toString().trim())
+    console.log('saved obj : ', obj);
+   })
+  })
+  .catch(err => { throw err; })
+
+ 
